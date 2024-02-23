@@ -1,4 +1,5 @@
 const CommentRepliesRepository = require("../../../Domains/comment_replies/CommentRepliesRepository");
+const CommentLikesRepository = require("../../../Domains/comment_likes/CommentLikesRepository");
 const CommentRepository = require("../../../Domains/comments/CommentRepository");
 const ThreadRepository = require("../../../Domains/threads/ThreadRepository");
 const UserRepository = require("../../../Domains/users/UserRepository");
@@ -93,6 +94,7 @@ describe("GetThreadUseCase", () => {
 
     /** creting dependency of use case */
     const mockCommentRepliesRepository = new CommentRepliesRepository();
+    const mockCommentLikesRepository = new CommentLikesRepository();
     const mockCommentRepository = new CommentRepository();
     const mockThreadRepository = new ThreadRepository();
     const mockUserRepository = new UserRepository();
@@ -120,6 +122,10 @@ describe("GetThreadUseCase", () => {
         }
         return Promise.resolve([]);
       });
+    mockCommentLikesRepository.getCommentLikeByCommentId = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve(1));
+
 
     /** create use case instance */
     const getThreadUseCase = new GetThreadUseCase({
@@ -127,10 +133,12 @@ describe("GetThreadUseCase", () => {
       commentRepository: mockCommentRepository,
       threadRepository: mockThreadRepository,
       userRepository: mockUserRepository,
+      commentLikesRepository: mockCommentLikesRepository,
     });
 
     // Action
     const threadDetails = await getThreadUseCase.execute("thread-123");
+
     // Assert
     expect(threadDetails.comments).toHaveLength(3);
     expect(threadDetails.comments[0].content).toEqual("this is first");
@@ -169,6 +177,7 @@ describe("GetThreadUseCase", () => {
       commentData[0].created_at.toString()
     );
     expect(threadDetails.comments[0].username).toEqual(userArnold.username);
+    expect(threadDetails.comments[0].likeCount).toEqual(1);
 
     // Assert replies availability and details
     expect(threadDetails.comments[0].replies[0].id).toEqual(replyData[0].id);
@@ -193,6 +202,15 @@ describe("GetThreadUseCase", () => {
     expect(
       mockCommentRepliesRepository.getCommentReplyByCommentId
     ).toBeCalledWith("comment-123");
+    expect(
+      mockCommentLikesRepository.getCommentLikeByCommentId
+    ).toBeCalledWith("comment-123");
+    expect(
+      mockCommentLikesRepository.getCommentLikeByCommentId
+    ).toBeCalledWith("comment-124");
+    expect(
+      mockCommentLikesRepository.getCommentLikeByCommentId
+    ).toBeCalledWith("comment-125");
   });
 
   it("should orchestrating get the details thread if there no comment", async () => {

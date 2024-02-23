@@ -23,6 +23,7 @@ describe("a CommentDetails", () => {
       content: "something",
       date: "something",
       username: "something",
+      likeCount: "1",
       replies: "[]",
     };
 
@@ -31,14 +32,16 @@ describe("a CommentDetails", () => {
       "COMMENT_DETAILS.PROPERTY_HAVE_WRONG_DATA_TYPE"
     );
   });
+  
 
-  it("should throw error when payload contain wrong data type", () => {
+  it("should not throw error when payload contain wrong data type", () => {
     // Arrange
     const payload = {
       id: "something",
       content: "something",
       date: "something",
       username: "something",
+      likeCount: 1,
       replies: [],
     };
 
@@ -50,6 +53,7 @@ describe("a CommentDetails", () => {
     expect(commentDetails.content).toEqual(payload.content);
     expect(commentDetails.date).toEqual(payload.date);
     expect(commentDetails.username).toEqual(payload.username);
+    expect(commentDetails.likeCount).toEqual(payload.likeCount);
     expect(commentDetails.replies).toEqual(payload.replies);
   });
 });
