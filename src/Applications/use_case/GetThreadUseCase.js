@@ -8,11 +8,13 @@ class GetThreadUseCase {
     threadRepository,
     commentRepository,
     commentRepliesRepository,
+    commentLikesRepository,
   }) {
     this._userRepository = userRepository;
     this._threadRepository = threadRepository;
     this._commentRepository = commentRepository;
     this._commentRepliesRepository = commentRepliesRepository;
+    this._commentLikesRepository = commentLikesRepository;
   }
 
   async execute(useCaseThreadId) {
@@ -41,11 +43,15 @@ class GetThreadUseCase {
       for (const commentData of commentsInThread) {
         const commentUsername =
           await this._userRepository.getUsernameById(commentData.owner);
+
+        const likeCount = await this._commentLikesRepository.getCommentLikeByCommentId(commentData.id);
+
         const commentDetails = new CommentDetails({
           id: commentData.id,
           content: commentData.is_delete ? '**komentar telah dihapus**' : commentData.content,
           date: commentData.created_at.toString(),
           username: commentUsername,
+          likeCount: likeCount,
           replies: [],
         });
 
