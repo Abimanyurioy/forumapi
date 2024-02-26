@@ -209,6 +209,15 @@ describe("/threads endpoint", () => {
         },
       });
       const commentId = JSON.parse(comment.payload)?.data?.addedComment.id;
+      
+      // add comment likes
+      await server.inject({
+        method: "PUT",
+        url: `/threads/${threadId}/comments/${commentId}/likes`,
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
 
       // add comment replies
       await server.inject({

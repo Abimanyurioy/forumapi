@@ -23,6 +23,8 @@ const CommentRepository = require("../Domains/comments/CommentRepository");
 const CommentRepositoryPostgres = require("./repository/CommentRepositoryPostgres");
 const CommentRepliesRepository = require("../Domains/comment_replies/CommentRepliesRepository");
 const CommentRepliesRepositoryPostgres = require("./repository/CommentRepliesRepositoryPostgres");
+const CommentLikesRepository = require("../Domains/comment_likes/CommentLikesRepository");
+const CommentLikesRepositoryPostgres = require("./repository/CommentLikesRepositoryPostgres");
 
 // use case
 const AddUserUseCase = require("../Applications/use_case/AddUserUseCase");
@@ -35,6 +37,7 @@ const DeleteCommentUseCase = require("../Applications/use_case/DeleteCommentUseC
 const AddRepliesUseCase = require("../Applications/use_case/AddRepliesUseCase");
 const DeleteRepliesUseCase = require("../Applications/use_case/DeleteRepliesUseCase");
 const GetThreadUseCase = require("../Applications/use_case/GetThreadUseCase");
+const LikeCommentUseCase = require("../Applications/use_case/LikeCommentUseCase");
 
 // creating container
 const container = createContainer();
@@ -119,6 +122,20 @@ container.register([
   {
     key: CommentRepliesRepository.name,
     Class: CommentRepliesRepositoryPostgres,
+    parameter: {
+      dependencies: [
+        {
+          concrete: pool,
+        },
+        {
+          concrete: nanoid,
+        },
+      ],
+    },
+  },
+  {
+    key: CommentLikesRepository.name,
+    Class: CommentLikesRepositoryPostgres,
     parameter: {
       dependencies: [
         {
@@ -312,6 +329,35 @@ container.register([
         {
           name: "commentRepliesRepository",
           internal: CommentRepliesRepository.name,
+        },
+        {
+          name: "commentLikesRepository",
+          internal: CommentLikesRepository.name,
+        },
+      ],
+    },
+  },
+  {
+    key: LikeCommentUseCase.name,
+    Class: LikeCommentUseCase,
+    parameter: {
+      injectType: "destructuring",
+      dependencies: [
+        {
+          name: "commentLikesRepository",
+          internal: CommentLikesRepository.name,
+        },
+        {
+          name: "commentRepository",
+          internal: CommentRepository.name,
+        },
+        {
+          name: "threadRepository",
+          internal: ThreadRepository.name,
+        },
+        {
+          name: "userRepository",
+          internal: UserRepository.name,
         },
       ],
     },
